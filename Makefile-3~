@@ -1,0 +1,46 @@
+
+# Nom de l'executable
+EXE=proc
+
+SOURCES=$(wildcard $(EXE)-*.c)
+OBJETS=$(SOURCES:%.c=%.o)
+
+# Nom du compilateur
+CC=gcc
+
+# Options du compilateur
+#  -g débogage
+#  -std=c99
+#  -I include
+CFLAGS=
+
+.PHONY: help clean reset list
+
+help:
+	@echo "Choose clean, reset, list"
+
+clean:
+	\rm -f *~ *.bak
+
+reset: clean
+	\rm -f *.o
+
+list:
+	@echo "fichiers .c : ";
+	@ls *.c ;
+	@echo "fichiers .h : ";
+	@ls *.h
+
+%.o : %.c
+	$(CC) $*.c -c $(CFLAGS)
+
+$(EXE): $(OBJETS)
+	$(CC) -o $(EXE) $(OBJETS) $(CFLAGS)
+
+proc-main.o: proc-main.c proc-fils.h proc-sign.h proc-mesg.h
+
+proc-sign.o: proc-sign.c proc-sign.h proc-mesg.h
+
+proc-mesg.o: proc-mesg.c proc-mesg.h
+
+proc-fils.o: proc-fils.c proc-fils.h proc-mesg.h

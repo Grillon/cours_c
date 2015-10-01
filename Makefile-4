@@ -1,0 +1,58 @@
+# Nom de l'executable
+EXE=proc
+# Nom du fichier temporaire contenant les dependances
+MAKEDEPFILE=Dependencies-$(EXE)
+
+SOURCES=$(wildcard $(EXE)-*.c)
+OBJETS=$(SOURCES:%.c=%.o)
+
+# Nom du compilateur
+CC=gcc
+MAKEDEP=gccmakedep -f $(MAKEDEPFILE)
+
+# Options du compilateur
+#  -g débogage
+#  -std=c99
+#  -I include
+CFLAGS=
+
+.PHONY: help clean reset list all build depend
+
+all: depend build
+
+build: $(EXE)
+	@echo "Construction de l'executable $(EXE)";
+
+help:
+	@echo "Choose clean, reset, list"
+
+clean:
+	\rm -f *~ *.bak
+
+reset: clean
+	\rm -f *.o
+
+list:
+	@echo "fichiers .c : ";
+	@ls *.c ;
+	@echo "fichiers .h : ";
+	@ls *.h ;
+	@echo "SOURCES = $(SOURCES)"
+
+%.o : %.c
+	$(CC) $*.c -c $(CFLAGS)
+
+$(EXE): $(OBJETS)
+	@echo "Edition de lien" ;
+	$(CC) -o $(EXE) $(OBJETS) $(CFLAGS)
+
+depend:
+	@echo "Calcul des dependances" ;
+	@$(MAKEDEP) -- $(CFLAGS) -- $(SOURCES)
+
+-include $(MAKEDEPFILE)
+
+# proc-main.o: proc-main.c proc-fils.h proc-sign.h proc-mesg.h
+# proc-sign.o: proc-sign.c proc-sign.h proc-mesg.h
+# proc-mesg.o: proc-mesg.c proc-mesg.h
+# proc-fils.o: proc-fils.c proc-fils.h proc-mesg.h
